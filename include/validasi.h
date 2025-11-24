@@ -1,7 +1,8 @@
 #ifndef VALIDASI_H
 #define VALIDASI_H
 
-#include "tipe_data.h"
+typedef struct PosAnggaran PosAnggaran;
+typedef struct Transaksi Transaksi;
 
 int isPositive(double angka);
 int isNotEmpty(const char *teks);

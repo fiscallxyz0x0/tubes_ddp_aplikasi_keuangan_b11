@@ -1,6 +1,25 @@
 #include <stdio.h>
 #include <string.h>
+#include <laporan.h>
 #include <perhitungan.h>
+
+// Menggunakan string tetap untuk memudahkan I/O teks
+struct PosAnggaran {
+    int kodePos;                 // Kode numerik internal (unik)
+    char namaPos[64];            // Nama kategori pos anggaran
+    double batasNominal;         // Batas anggaran untuk pos
+};
+
+struct Transaksi {
+    char kodeTransaksi[8];       // Format: T001, T002, ...
+    char tanggal[16];            // Format bebas: YYYY-MM-DD disarankan
+    char jenis[16];              // "Pemasukan" atau "Pengeluaran"
+    char kategori[64];           // Nama pos anggaran terkait
+    double nominal;              // Nilai uang
+    char deskripsi[128];         // Catatan singkat
+};
+
+extern const int maks_pos;
 
 void tampilkanAnalisisKondisi(double saldo) {
     const char *kondisi = analisisKondisiKeuangan(saldo);
@@ -20,7 +39,7 @@ void tampilkanKesimpulanMahasiswa(double totalPemasukan, double saldo) {
 }
 
 void tampilkanRealisasiPosAnggaran(PosAnggaran *arrayPos, int jumlahPos, Transaksi *arrayTrx, int jumlahTrx) {
-    double realisasi[MAKS_POS];
+    double realisasi[maks_pos];
     hitungRealisasiAnggaran(arrayPos, jumlahPos, arrayTrx, jumlahTrx, realisasi);
 
     printf("\n=== Realisasi Pos Anggaran ===\n");

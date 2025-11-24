@@ -1,26 +1,45 @@
+// Menggunakan string tetap untuk memudahkan I/O teks
+struct PosAnggaran {
+    int kodePos;                 // Kode numerik internal (unik)
+    char namaPos[64];            // Nama kategori pos anggaran
+    double batasNominal;         // Batas anggaran untuk pos
+};
+
+struct Transaksi {
+    char kodeTransaksi[8];       // Format: T001, T002, ...
+    char tanggal[16];            // Format bebas: YYYY-MM-DD disarankan
+    char jenis[16];              // "Pemasukan" atau "Pengeluaran"
+    char kategori[64];           // Nama pos anggaran terkait
+    double nominal;              // Nilai uang
+    char deskripsi[128];         // Catatan singkat
+};
+
 #include <stdio.h>
 #include <string.h>
-#include <tipe_data.h>
-#include "file_handler.h"
-#include "validasi.h"
-#include "tampilan.h"
-#include "pos_anggaran.h"
-#include "transaksi.h"
-#include "perhitungan.h"
-#include "laporan.h"
+#include <operasi_file.h>
+#include <tampilan.h>
+#include <pos_anggaran.h>
+#include <transaksi.h>
+#include <laporan.h>
+#include <perhitungan.h>
 
 #define FILE_POS "data/pos_anggaran.txt"
 #define FILE_TRX "data/data_keuangan.txt"
+#define NILAI_MAKS_POS 200
+#define NILAI_MAKS_TRANSAKSI 1000
 
-int main(void) {
-    PosAnggaran arrayPos[MAKS_POS];
+int maks_pos = NILAI_MAKS_POS;
+int maks_transaksi = NILAI_MAKS_TRANSAKSI;
+
+int main() {
+    PosAnggaran arrayPos[maks_pos];
     int jumlahPos = 0;
-    Transaksi arrayTrx[MAKS_TRANSAKSI];
+    Transaksi arrayTrx[maks_transaksi];
     int jumlahTrx = 0;
     int nomorTrxBerikutnya = 1;
 
     // Muat transaksi dari file pada awal
-    jumlahTrx = bacaTransaksiDariFile(arrayTrx, MAKS_TRANSAKSI, FILE_TRX);
+    jumlahTrx = bacaTransaksiDariFile(arrayTrx, maks_transaksi, FILE_TRX);
     nomorTrxBerikutnya = jumlahTrx + 1;
 
     // Muat pos anggaran dari file (opsional sederhana)
@@ -29,7 +48,7 @@ int main(void) {
         FILE *f = fopen(FILE_POS, "r");
         if (f) {
             char baris[256];
-            while (fgets(baris, sizeof(baris), f) && jumlahPos < MAKS_POS) {
+            while (fgets(baris, sizeof(baris), f) && jumlahPos < maks_pos) {
                 int kode; char nama[64]; double batas;
                 // Parsing sederhana
                 if (sscanf(baris, "%d|%63[^|]|%lf", &kode, nama, &batas) == 3) {

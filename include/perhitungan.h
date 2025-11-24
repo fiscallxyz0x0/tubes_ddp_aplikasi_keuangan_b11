@@ -1,7 +1,8 @@
 #ifndef PERHITUNGAN_H
 #define PERHITUNGAN_H
 
-#include "tipe_data.h"
+typedef struct PosAnggaran PosAnggaran;
+typedef struct Transaksi Transaksi;
 
 double hitungTotalPemasukan(const Transaksi *arrayTrx, int jumlahTrx);
 double hitungTotalPengeluaran(Transaksi *arrayTrx, int jumlahTrx);

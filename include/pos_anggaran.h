@@ -1,7 +1,8 @@
 #ifndef POS_ANGGARAN_H
 #define POS_ANGGARAN_H
 
-#include "tipe_data.h"
+typedef struct PosAnggaran PosAnggaran;
+typedef struct Transaksi Transaksi;
 
 PosAnggaran inputPosAnggaran(void);
 int validasiPosAnggaran(const char *nama, double batas, PosAnggaran *arrayPos, int jumlahPos);
