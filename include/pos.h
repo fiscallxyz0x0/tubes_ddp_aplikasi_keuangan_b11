@@ -1,3 +1,34 @@
+/*
+ * =============================================================================
+ * File        : pos.h
+ * Deskripsi   : Header file untuk modul pengelolaan pos anggaran
+ * Author      : Elang Permadi Lau
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini menyediakan fungsi-fungsi untuk mengelola pos anggaran dalam
+ * aplikasi keuangan mahasiswa, termasuk:
+ * - Operasi CRUD (Create, Read, Update, Delete) untuk pos anggaran
+ * - Perhitungan realisasi dan sisa anggaran per pos
+ * - Penentuan status pos (Aman/Tidak Aman berdasarkan budget)
+ * - Tampilan interaktif untuk manajemen pos anggaran
+ * - Validasi data pos anggaran
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - file.h      : Untuk operasi penyimpanan dan pembacaan file pos
+ * - transaksi.h : Untuk forward declaration struct Transaksi
+ * - utils.h     : Untuk fungsi utilitas string dan formatting
+ * - tui.h       : Untuk tampilan antarmuka pengguna
+ *
+ * CATATAN:
+ * Setiap pos anggaran memiliki batas nominal dan status yang otomatis
+ * dikalkulasi berdasarkan transaksi pengeluaran yang terkait.
+ * Fungsi validasi pos telah dipindahkan dari validator.h ke modul ini.
+ * =============================================================================
+ */
+
 #ifndef POS_H
 #define POS_H
 
@@ -267,5 +298,63 @@ void penanganan_ubah_pos(int bulan);
     F. S. : Pos dihapus jika pengguna konfirmasi.
 */
 void penanganan_hapus_pos(int bulan);
+
+/* ===== FUNGSI VALIDASI POS (dipindahkan dari validator.h) ===== */
+
+/*
+    Function bertujuan untuk memvalidasi nomor pos dalam range yang valid.
+    Input : no (Nomor pos), max (Nilai maksimum)
+    Output : Mengembalikan 1 jika valid, 0 jika tidak valid.
+*/
+int validasi_no_pos(int no, int max);
+
+/*
+    Function bertujuan untuk memvalidasi nama pos unik (belum ada di daftar).
+    Input : nama (Nama pos baru), list (Array pos anggaran), count (Jumlah pos)
+    Output : Mengembalikan 1 jika unik, 0 jika sudah ada.
+*/
+int validasi_pos_unik(const char *nama, PosAnggaran *list, int count);
+
+/*
+    Function bertujuan untuk memvalidasi pos dengan nomor tertentu ada dalam daftar.
+    Input : no (Nomor pos), list (Array pos anggaran), count (Jumlah pos)
+    Output : Mengembalikan 1 jika ada, 0 jika tidak ada.
+*/
+int validasi_pos_ada(int no, PosAnggaran *list, int count);
+
+/*
+    Function bertujuan untuk mendapatkan nama pos berdasarkan nomor.
+    Input : no (Nomor pos), list (Array pos), count (Jumlah pos)
+    Output : result (Buffer hasil nama pos). Mengembalikan 1 jika ditemukan, 0 jika tidak.
+*/
+int dapatkan_nama_pos_berdasarkan_no(int no, PosAnggaran *list, int count, char *result);
+
+/*
+    Function bertujuan untuk mendapatkan index pos berdasarkan nama.
+    Input : nama (Nama pos), list (Array pos), count (Jumlah pos)
+    Output : Mengembalikan index jika ditemukan, -1 jika tidak.
+*/
+int dapatkan_index_pos_berdasarkan_nama(const char *nama, PosAnggaran *list, int count);
+
+/*
+    Function bertujuan untuk memvalidasi nama pos untuk edit (unik kecuali nama yang sedang diedit).
+    Input : nama (Nama pos baru), no_edit (Nomor pos yang diedit), list (Array pos), count (Jumlah pos)
+    Output : Mengembalikan 1 jika valid, 0 jika tidak valid.
+*/
+int validasi_pos_unik_edit(const char *nama, int no_edit, PosAnggaran *list, int count);
+
+/*
+    Function bertujuan untuk memvalidasi pos bisa dihapus (tidak ada transaksi terkait).
+    Input : no (Nomor pos), pos_list (Array pos), pos_count (Jumlah pos)
+    Output : Mengembalikan 1 jika bisa dihapus, 0 jika tidak.
+*/
+int validasi_pos_bisa_hapus(int no, PosAnggaran *pos_list, int pos_count);
+
+/*
+    Function bertujuan untuk memvalidasi panjang nama pos anggaran.
+    Input : nama (Nama pos yang divalidasi)
+    Output : Mengembalikan 1 jika valid, 0 jika terlalu panjang.
+*/
+int validasi_panjang_pos(const char *nama);
 
 #endif

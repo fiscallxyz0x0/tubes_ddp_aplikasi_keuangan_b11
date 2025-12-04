@@ -1,11 +1,46 @@
+/*
+ * =============================================================================
+ * File        : transaksi.c
+ * Deskripsi   : Implementasi modul pengelolaan transaksi keuangan
+ * Author      : Elang Permadi Lau
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini mengimplementasikan fungsi-fungsi untuk mengelola transaksi
+ * keuangan mahasiswa, termasuk:
+ * - Operasi CRUD (Create, Read, Update, Delete) untuk transaksi
+ * - Pencatatan transaksi pemasukan dan pengeluaran
+ * - Perhitungan total pemasukan, pengeluaran, dan jumlah transaksi
+ * - Generate ID transaksi unik secara otomatis
+ * - Tampilan interaktif untuk manajemen transaksi
+ * - Validasi data transaksi
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - stdio.h     : Untuk fungsi input/output standar
+ * - string.h    : Untuk manipulasi string
+ * - ctype.h     : Untuk fungsi isdigit dalam validasi
+ * - transaksi.h : Header file modul ini
+ * - file.h      : Untuk operasi penyimpanan dan pembacaan file transaksi
+ * - pos.h       : Untuk integrasi dengan pos anggaran
+ * - tui.h       : Untuk tampilan antarmuka pengguna
+ * - utils.h     : Untuk fungsi utilitas string dan formatting
+ *
+ * CATATAN:
+ * Fungsi validasi transaksi telah dipindahkan dari validator.c ke modul ini.
+ * Setiap transaksi memiliki ID unik dengan format T0001-T9999.
+ * =============================================================================
+ */
+
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "transaksi.h"
 #include "file.h"
 #include "pos.h"
 #include "tui.h"
 #include "utils.h"
-#include "validator.h"
 
 /* ===== KONSTANTA LOKAL ===== */
 /* Aksi Menu */
@@ -786,4 +821,46 @@ void penanganan_hapus_transaksi(int bulan) {
     }
 
     tampilkan_konfirmasi_hapus_transaksi(list[pilihan].id);
+}
+
+/* ===== IMPLEMENTASI FUNGSI VALIDASI TRANSAKSI (dipindahkan dari validator.c) ===== */
+
+/**
+ * Validasi jenis transaksi (0 atau 1)
+ */
+int validasi_jenis_transaksi(int jenis) {
+    return (jenis == JENIS_PENGELUARAN || jenis == JENIS_PEMASUKAN);
+}
+
+/**
+ * Validasi panjang deskripsi transaksi
+ */
+int validasi_panjang_deskripsi(const char *deskripsi) {
+    if (deskripsi == NULL) return 0;
+
+    return (strlen(deskripsi) <= MAX_DESKRIPSI_LENGTH);
+}
+
+/**
+ * Validasi format ID transaksi (T0001-T9999)
+ */
+int validasi_format_id(const char *id) {
+    if (id == NULL) return 0;
+
+    int len = strlen(id);
+
+    /* ID harus 5 karakter (T + 4 digit) */
+    if (len != 5) return 0;
+
+    /* Karakter pertama harus 'T' */
+    if (id[0] != 'T') return 0;
+
+    /* 4 karakter berikutnya harus digit */
+    for (int i = 1; i < 5; i++) {
+        if (!isdigit((unsigned char)id[i])) {
+            return 0;
+        }
+    }
+
+    return 1;
 }

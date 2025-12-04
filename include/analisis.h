@@ -1,3 +1,36 @@
+/*
+ * =============================================================================
+ * File        : analisis.h
+ * Deskripsi   : Header file untuk modul analisis dan perhitungan keuangan
+ * Author      : Ghaisan Khoirul Badruzaman
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini menyediakan fungsi-fungsi untuk melakukan analisis dan perhitungan
+ * keuangan mahasiswa, termasuk:
+ * - Perhitungan total pemasukan dan pengeluaran per bulan
+ * - Perhitungan saldo dan rata-rata pengeluaran
+ * - Analisis kondisi keuangan (Defisit/Seimbang/Surplus)
+ * - Penentuan kesimpulan dan saran keuangan
+ * - Perhitungan persentase sisa terhadap pemasukan
+ * - Tampilan grafik dan laporan analisis
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - transaksi.h : Untuk akses data transaksi dan perhitungan
+ * - pos.h       : Untuk akses data pos anggaran
+ * - utils.h     : Untuk fungsi utilitas formatting
+ * - tui.h       : Untuk tampilan antarmuka pengguna
+ * - file.h      : Untuk operasi penyimpanan analisis
+ *
+ * CATATAN:
+ * Kondisi keuangan ditentukan berdasarkan perbandingan pemasukan dan pengeluaran.
+ * Kesimpulan diberikan berdasarkan persentase sisa terhadap total pemasukan:
+ * - Hemat (>25%), Seimbang (1-25%), Boros (0 s/d -10%), Tidak Sehat (<-10%)
+ * =============================================================================
+ */
+
 #ifndef ANALISIS_H
 #define ANALISIS_H
 

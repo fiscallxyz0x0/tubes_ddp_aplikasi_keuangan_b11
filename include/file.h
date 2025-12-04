@@ -1,3 +1,38 @@
+/*
+ * =============================================================================
+ * File        : file.h
+ * Deskripsi   : Header file untuk modul manipulasi dan persistensi file
+ * Author      : Hafiz Fauzan Syafrudin
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini menyediakan fungsi-fungsi untuk operasi file dalam aplikasi
+ * keuangan mahasiswa, termasuk:
+ * - Penyimpanan dan pembacaan data transaksi dari file
+ * - Penyimpanan dan pembacaan data pos anggaran dari file
+ * - Manajemen direktori data dan pembuatan file otomatis
+ * - Format file teks dengan delimiter pipe (|)
+ * - Fungsi CRUD level file untuk semua entitas data
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - stdio.h     : Untuk operasi file standar (fopen, fclose, fprintf, fscanf)
+ * - stdlib.h    : Untuk alokasi memori
+ * - string.h    : Untuk manipulasi string
+ * - sys/stat.h  : Untuk operasi direktori (mkdir)
+ * - utils.h     : Untuk fungsi utilitas string
+ * - pos.h       : Untuk definisi struct PosAnggaran
+ * - transaksi.h : Untuk definisi struct Transaksi
+ * - analisis.h  : Untuk definisi struct AnalisisKeuangan
+ *
+ * CATATAN:
+ * Semua data disimpan dalam direktori 'data/' dengan format file teks.
+ * File dibuat per bulan untuk memudahkan pengelolaan dan filtering.
+ * Format baris: field1|field2|field3|... (delimiter: pipe)
+ * =============================================================================
+ */
+
 #ifndef FILE_H
 #define FILE_H
 

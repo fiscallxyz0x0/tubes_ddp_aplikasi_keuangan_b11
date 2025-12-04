@@ -1,3 +1,39 @@
+/*
+ * =============================================================================
+ * File        : file.c
+ * Deskripsi   : Implementasi modul manipulasi dan persistensi file
+ * Author      : Hafiz Fauzan Syafrudin
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini mengimplementasikan fungsi-fungsi untuk operasi file dalam
+ * aplikasi keuangan mahasiswa, termasuk:
+ * - Penyimpanan dan pembacaan data transaksi dari file
+ * - Penyimpanan dan pembacaan data pos anggaran dari file
+ * - Manajemen direktori data dan pembuatan file otomatis
+ * - Format file teks dengan delimiter pipe (|)
+ * - Fungsi CRUD level file untuk semua entitas data
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - stdio.h      : Untuk operasi file standar (fopen, fclose, fprintf, fgets)
+ * - stdlib.h     : Untuk alokasi memori dan konversi (atoi, strtoull)
+ * - string.h     : Untuk manipulasi string (strcpy, strtok)
+ * - ctype.h      : Untuk pengecekan karakter
+ * - sys/stat.h   : Untuk operasi direktori (mkdir, stat)
+ * - sys/types.h  : Untuk tipe data sistem
+ * - errno.h      : Untuk penanganan error
+ * - file.h       : Header file modul ini
+ * - utils.h      : Untuk fungsi utilitas string
+ *
+ * CATATAN:
+ * Semua data disimpan dalam direktori 'data/' dengan format file teks.
+ * File dibuat per bulan untuk memudahkan pengelolaan dan filtering.
+ * Format baris: field1|field2|field3|... (delimiter: pipe)
+ * =============================================================================
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

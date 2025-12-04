@@ -1,3 +1,39 @@
+/*
+ * =============================================================================
+ * File        : main.c
+ * Deskripsi   : File utama program Aplikasi Keuangan Mahasiswa
+ * Author      : Hafiz Fauzan Syafrudin
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini merupakan titik masuk (entry point) aplikasi keuangan mahasiswa.
+ * Bertanggung jawab untuk:
+ * - Inisialisasi sistem (locale, direktori data, TUI)
+ * - Menampilkan splash screen pembuka
+ * - Menjalankan loop utama menu aplikasi
+ * - Mengkoordinasikan navigasi antar modul (transaksi, pos, analisis)
+ * - Menangani pembersihan saat aplikasi ditutup
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - stdio.h     : Untuk output error ke stderr
+ * - stdlib.h    : Untuk fungsi umum C
+ * - locale.h    : Untuk dukungan karakter Unicode
+ * - string.h    : Untuk manipulasi string
+ * - file.h      : Untuk memastikan direktori data ada
+ * - tui.h       : Untuk antarmuka pengguna
+ * - pos.h       : Untuk modul pos anggaran
+ * - transaksi.h : Untuk modul transaksi
+ * - analisis.h  : Untuk modul analisis keuangan
+ * - utils.h     : Untuk fungsi utilitas
+ *
+ * CATATAN:
+ * Program ini menggunakan ncurses untuk tampilan TUI interaktif.
+ * Bulan aktif disimpan secara global untuk koordinasi antar modul.
+ * =============================================================================
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -31,9 +67,31 @@ static void tampilkan_bantuan(void);
 
 /* ===== FUNGSI UTAMA ===== */
 
-/**
- * @brief Fungsi utama - titik masuk aplikasi
- * @return 0 jika sukses, 1 jika error
+/*
+ * -----------------------------------------------------------------------------
+ * Nama Fungsi    : main
+ * -----------------------------------------------------------------------------
+ * Deskripsi      : Fungsi utama aplikasi - titik masuk program. Melakukan
+ *                  inisialisasi sistem, menampilkan splash screen, dan
+ *                  menjalankan loop utama menu aplikasi.
+ *
+ * Mengembalikan  : int - 0 jika aplikasi berjalan dan ditutup dengan sukses,
+ *                  1 jika terjadi error saat inisialisasi
+ *
+ * Modul Pemanggil: Sistem operasi (entry point program)
+ * Modul Dipanggil: pastikan_direktori_data, tui_inisialisasi, tui_inisialisasi_warna,
+ *                  dapatkan_bulan_saat_ini, tampilkan_splash_screen, menu_utama,
+ *                  jalankan_modul_transaksi, jalankan_modul_pos, jalankan_modul_analisis,
+ *                  pilih_bulan_global, tampilkan_bantuan, tampilkan_tentang,
+ *                  tampilkan_konfirmasi, tui_bersihkan
+ *
+ * Author/PIC     : Hafiz Fauzan Syafrudin
+ * Version        : v1.0 (3 Desember 2025)
+ * -----------------------------------------------------------------------------
+ * Parameter Input: Tidak ada
+ *
+ * Parameter Output: Tidak ada (status dikembalikan via return)
+ * -----------------------------------------------------------------------------
  */
 int main(void) {
     /* Atur locale untuk mendukung karakter khusus */
@@ -102,10 +160,30 @@ int main(void) {
 
 /* ===== IMPLEMENTASI FUNGSI LOKAL ===== */
 
-/**
- * Tampilkan splash screen aplikasi
- * I.S.: Layar tui terinisialisasi
- * F.S.: Splash screen ditampilkan, menunggu input user
+/*
+ * -----------------------------------------------------------------------------
+ * Nama Prosedur  : tampilkan_splash_screen
+ * -----------------------------------------------------------------------------
+ * Deskripsi      : Menampilkan layar pembuka (splash screen) aplikasi dengan
+ *                  banner ASCII art, informasi pembuat, dan versi aplikasi.
+ *
+ * Perubahan State: Menampilkan konten ke layar terminal
+ *
+ * I.S (Initial State)  : TUI sudah terinisialisasi, layar mungkin berisi konten
+ * F.S (Final State)    : Splash screen ditampilkan, program menunggu input user
+ *
+ * Modul Pemanggil: main (main.c)
+ * Modul Dipanggil: tui_hapus_layar, tui_ambil_tinggi, tui_ambil_lebar,
+ *                  tui_aktifkan_warna, tui_aktifkan_tebal, tui_cetak,
+ *                  tui_cetak_tengah, tui_segarkan, tui_ambil_karakter
+ *
+ * Author/PIC     : Hafiz Fauzan Syafrudin
+ * Version        : v1.0 (3 Desember 2025)
+ * -----------------------------------------------------------------------------
+ * Parameter Input: Tidak ada
+ *
+ * Parameter Output: Tidak ada (output ke layar)
+ * -----------------------------------------------------------------------------
  */
 static void tampilkan_splash_screen(void) {
     tui_hapus_layar();
@@ -154,6 +232,30 @@ static void tampilkan_splash_screen(void) {
     tui_ambil_karakter();
 }
 
+/*
+ * -----------------------------------------------------------------------------
+ * Nama Fungsi    : menu_utama
+ * -----------------------------------------------------------------------------
+ * Deskripsi      : Menampilkan dan menangani navigasi menu utama aplikasi.
+ *                  Menu terdiri dari pilihan: Transaksi, Pos Anggaran, Analisis,
+ *                  Ganti Bulan, Bantuan, Tentang, dan Keluar.
+ *
+ * Mengembalikan  : int - Kode aksi yang dipilih pengguna (ACT_TRANSAKSI,
+ *                  ACT_POS, ACT_ANALISIS, ACT_BULAN, ACT_BANTUAN,
+ *                  ACT_TENTANG, ACT_KELUAR, atau CANCEL)
+ *
+ * Modul Pemanggil: main (main.c)
+ * Modul Dipanggil: dapatkan_nama_bulan, menu_inisialisasi, menu_tambah_item,
+ *                  menu_navigasi
+ *
+ * Author/PIC     : Hafiz Fauzan Syafrudin
+ * Version        : v1.0 (3 Desember 2025)
+ * -----------------------------------------------------------------------------
+ * Parameter Input: Tidak ada (menggunakan variabel global bulan_aktif)
+ *
+ * Parameter Output: Tidak ada (nilai dikembalikan via return)
+ * -----------------------------------------------------------------------------
+ */
 static int menu_utama(void) {
     char judul[80];
     snprintf(judul, sizeof(judul), "MENU UTAMA - Bulan: %s", dapatkan_nama_bulan(bulan_aktif));
@@ -172,14 +274,57 @@ static int menu_utama(void) {
     return menu_navigasi(&menu);
 }
 
+/*
+ * -----------------------------------------------------------------------------
+ * Nama Fungsi    : pilih_bulan_global
+ * -----------------------------------------------------------------------------
+ * Deskripsi      : Wrapper function untuk menampilkan menu pemilihan bulan
+ *                  dan mengembalikan bulan yang dipilih pengguna.
+ *
+ * Mengembalikan  : int - Nomor bulan yang dipilih (1-12), atau bulan saat ini
+ *                  jika pengguna membatalkan
+ *
+ * Modul Pemanggil: main (main.c)
+ * Modul Dipanggil: menu_pilih_bulan (pos.c)
+ *
+ * Author/PIC     : Hafiz Fauzan Syafrudin
+ * Version        : v1.0 (3 Desember 2025)
+ * -----------------------------------------------------------------------------
+ * Parameter Input:
+ *   - bulan_saat_ini (int) : Bulan yang sedang aktif saat ini
+ *
+ * Parameter Output: Tidak ada (nilai dikembalikan via return)
+ * -----------------------------------------------------------------------------
+ */
 static int pilih_bulan_global(int bulan_saat_ini) {
     return menu_pilih_bulan(bulan_saat_ini);
 }
 
-/**
- * Tampilkan tentang aplikasi
- * I.S.: Layar menu
- * F.S.: Halaman tentang ditampilkan, menunggu input user
+/*
+ * -----------------------------------------------------------------------------
+ * Nama Prosedur  : tampilkan_tentang
+ * -----------------------------------------------------------------------------
+ * Deskripsi      : Menampilkan halaman informasi tentang aplikasi, termasuk
+ *                  versi, pembuat, mata kuliah, dan daftar fitur utama.
+ *
+ * Perubahan State: Menampilkan konten ke layar terminal
+ *
+ * I.S (Initial State)  : TUI sudah terinisialisasi, berada di menu utama
+ * F.S (Final State)    : Halaman tentang ditampilkan, menunggu input user
+ *                        untuk kembali ke menu
+ *
+ * Modul Pemanggil: main (main.c)
+ * Modul Dipanggil: tui_hapus_layar, tampilkan_header, tui_aktifkan_warna,
+ *                  tui_cetak, tui_gambar_garis_horizontal, tampilkan_footer,
+ *                  tui_segarkan, tui_ambil_karakter
+ *
+ * Author/PIC     : Hafiz Fauzan Syafrudin
+ * Version        : v1.0 (3 Desember 2025)
+ * -----------------------------------------------------------------------------
+ * Parameter Input: Tidak ada
+ *
+ * Parameter Output: Tidak ada (output ke layar)
+ * -----------------------------------------------------------------------------
  */
 static void tampilkan_tentang(void) {
     tui_hapus_layar();
@@ -227,10 +372,30 @@ static void tampilkan_tentang(void) {
     tui_ambil_karakter();
 }
 
-/**
- * Tampilkan bantuan penggunaan
- * I.S.: Layar menu
- * F.S.: Halaman bantuan ditampilkan, menunggu input user
+/*
+ * -----------------------------------------------------------------------------
+ * Nama Prosedur  : tampilkan_bantuan
+ * -----------------------------------------------------------------------------
+ * Deskripsi      : Menampilkan halaman bantuan penggunaan aplikasi dengan
+ *                  panduan navigasi keyboard dan penjelasan setiap menu.
+ *
+ * Perubahan State: Menampilkan konten ke layar terminal
+ *
+ * I.S (Initial State)  : TUI sudah terinisialisasi, berada di menu utama
+ * F.S (Final State)    : Halaman bantuan ditampilkan, menunggu input user
+ *                        untuk kembali ke menu
+ *
+ * Modul Pemanggil: main (main.c)
+ * Modul Dipanggil: tui_hapus_layar, tampilkan_header, tui_aktifkan_warna,
+ *                  tui_cetak, tampilkan_footer, tui_segarkan, tui_ambil_karakter
+ *
+ * Author/PIC     : Hafiz Fauzan Syafrudin
+ * Version        : v1.0 (3 Desember 2025)
+ * -----------------------------------------------------------------------------
+ * Parameter Input: Tidak ada
+ *
+ * Parameter Output: Tidak ada (output ke layar)
+ * -----------------------------------------------------------------------------
  */
 static void tampilkan_bantuan(void) {
     tui_hapus_layar();

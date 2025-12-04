@@ -1,8 +1,45 @@
+/*
+ * =============================================================================
+ * File        : utils.c
+ * Deskripsi   : Implementasi modul utilitas dan fungsi-fungsi pendukung
+ * Author      : Ghaisan Khoirul Badruzaman
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini mengimplementasikan fungsi-fungsi utilitas umum yang digunakan
+ * di seluruh aplikasi, termasuk:
+ * - Alokasi dan manajemen memori dinamis untuk struktur data
+ * - Pemrosesan dan manipulasi tanggal (parsing, formatting, validasi)
+ * - Pemrosesan dan manipulasi string (trim, case conversion, safe copy)
+ * - Formatting angka ke format Rupiah dan persentase
+ * - Fungsi validasi input (tanggal, nominal, string)
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - stdlib.h    : Untuk alokasi memori dinamis (malloc, free, strtoull)
+ * - stdio.h     : Untuk fungsi input/output standar (snprintf)
+ * - string.h    : Untuk manipulasi string (strlen, strcpy, memset)
+ * - ctype.h     : Untuk pengecekan dan konversi karakter (isdigit, tolower)
+ * - time.h      : Untuk mendapatkan tanggal/waktu sistem (localtime)
+ * - errno.h     : Untuk penanganan error pada konversi numerik
+ * - utils.h     : Header file modul ini
+ * - pos.h       : Untuk definisi struct PosAnggaran
+ * - transaksi.h : Untuk definisi struct Transaksi
+ * - analisis.h  : Untuk definisi struct AnalisisKeuangan
+ *
+ * CATATAN:
+ * Fungsi-fungsi validasi telah dipindahkan dari validator.c ke modul ini
+ * untuk konsolidasi fungsi-fungsi utilitas umum.
+ * =============================================================================
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <errno.h>
 #include "utils.h"
 #include "pos.h"
 #include "transaksi.h"
@@ -759,4 +796,239 @@ void hapus_newline_string(char *str) {
     while (len > 0 && (str[len - 1] == '\n' || str[len - 1] == '\r')) {
         str[--len] = '\0';
     }
+}
+
+/* ===== IMPLEMENTASI FUNGSI VALIDASI (dipindahkan dari validator.c) ===== */
+
+/**
+ * Validasi format tanggal dd-mm-YYYY
+ */
+int validasi_format_tanggal(const char *tanggal) {
+    if (tanggal == NULL) return 0;
+
+    int len = strlen(tanggal);
+
+    /* Panjang harus tepat 10 karakter (dd-mm-YYYY) */
+    if (len != 10) return 0;
+
+    /* Posisi 2 dan 5 harus berisi '-' */
+    if (tanggal[2] != '-' || tanggal[5] != '-') return 0;
+
+    /* Posisi lainnya harus digit */
+    for (int i = 0; i < 10; i++) {
+        if (i == 2 || i == 5) continue;  /* Skip posisi '-' */
+        if (!isdigit((unsigned char)tanggal[i])) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+/**
+ * Validasi tanggal benar-benar valid (termasuk kabisat)
+ */
+int validasi_tanggal_sah(int d, int m, int y) {
+    /* Validasi tahun */
+    if (y < 1900 || y > 2100) return 0;
+
+    /* Validasi bulan */
+    if (m < 1 || m > 12) return 0;
+
+    /* Validasi hari */
+    if (d < 1) return 0;
+
+    /* Dapatkan jumlah hari dalam bulan */
+    int max_days = dapatkan_jumlah_hari_bulan(m, y);
+
+    if (d > max_days) return 0;
+
+    return 1;
+}
+
+/**
+ * Validasi tanggal bukan 00-00-0000
+ */
+int validasi_bukan_nol(const char *tanggal) {
+    if (tanggal == NULL) return 0;
+
+    int d, m, y;
+    if (!urai_tanggal(tanggal, &d, &m, &y)) {
+        return 0;
+    }
+
+    /* Tanggal tidak boleh semua nol */
+    if (d == 0 && m == 0 && y == 0) {
+        return 0;
+    }
+
+    return 1;
+}
+
+/**
+ * Validasi tanggal lengkap (format dan kevalidan)
+ */
+int validasi_tanggal_lengkap(const char *tanggal) {
+    /* Cek format dulu */
+    if (!validasi_format_tanggal(tanggal)) {
+        return 0;
+    }
+
+    /* Parse komponen tanggal */
+    int d, m, y;
+    if (!urai_tanggal(tanggal, &d, &m, &y)) {
+        return 0;
+    }
+
+    /* Cek bukan tanggal nol */
+    if (!validasi_bukan_nol(tanggal)) {
+        return 0;
+    }
+
+    /* Cek kevalidan tanggal */
+    if (!validasi_tanggal_sah(d, m, y)) {
+        return 0;
+    }
+
+    return 1;
+}
+
+/**
+ * Validasi bulan dalam range 1-12
+ */
+int validasi_bulan(int bulan) {
+    return (bulan >= BULAN_MIN && bulan <= BULAN_MAX);
+}
+
+/**
+ * Validasi tahun (harus > 0 dan reasonable)
+ */
+int validasi_tahun(int tahun) {
+    return (tahun >= 1900 && tahun <= 2100);
+}
+
+/**
+ * Validasi bulan pada tanggal sesuai dengan bulan aktif
+ */
+int validasi_bulan_sesuai(const char *tanggal, int bulan_aktif) {
+    if (tanggal == NULL || bulan_aktif < 1 || bulan_aktif > 12) return 0;
+
+    int d, m, y;
+    if (!urai_tanggal(tanggal, &d, &m, &y)) {
+        return 0;
+    }
+
+    return (m == bulan_aktif);
+}
+
+/**
+ * Validasi nominal harus positif (> 0)
+ */
+int validasi_nominal_positif(unsigned long long nominal) {
+    return (nominal > 0);
+}
+
+/**
+ * Parse string ke unsigned long long dengan validasi
+ */
+int urai_nominal(const char *str, unsigned long long *result) {
+    if (str == NULL || result == NULL) return 0;
+
+    /* Skip whitespace di awal */
+    while (*str && isspace((unsigned char)*str)) {
+        str++;
+    }
+
+    /* String kosong tidak valid */
+    if (*str == '\0') return 0;
+
+    /* Cek apakah semua karakter adalah digit */
+    const char *p = str;
+    while (*p) {
+        if (!isdigit((unsigned char)*p)) {
+            return 0;  /* Karakter non-digit ditemukan */
+        }
+        p++;
+    }
+
+    /* Konversi dengan strtoull */
+    errno = 0;
+    char *endptr;
+    unsigned long long value = strtoull(str, &endptr, 10);
+
+    /* Cek error overflow */
+    if (errno == ERANGE) {
+        return 0;
+    }
+
+    /* Pastikan seluruh string terkonversi */
+    if (*endptr != '\0') {
+        return 0;
+    }
+
+    *result = value;
+    return 1;
+}
+
+/**
+ * Validasi pilihan menu dalam range
+ */
+int validasi_pilihan_menu(int pilihan, int min, int max) {
+    return (pilihan >= min && pilihan <= max);
+}
+
+/**
+ * Validasi string tidak kosong
+ */
+int validasi_tidak_kosong(const char *str) {
+    if (str == NULL) return 0;
+
+    /* Skip whitespace dan cek apakah ada karakter lain */
+    while (*str) {
+        if (!isspace((unsigned char)*str)) {
+            return 1;  /* Ditemukan karakter non-whitespace */
+        }
+        str++;
+    }
+
+    return 0;  /* String kosong atau hanya whitespace */
+}
+
+/**
+ * Validasi string tidak mengandung karakter pipe (|)
+ */
+int validasi_tidak_ada_pipe(const char *str) {
+    if (str == NULL) return 1;  /* NULL dianggap valid (tidak ada pipe) */
+
+    while (*str) {
+        if (*str == '|') {
+            return 0;  /* Ditemukan pipe */
+        }
+        str++;
+    }
+
+    return 1;  /* Tidak ada pipe */
+}
+
+/**
+ * Validasi string hanya mengandung karakter yang diizinkan
+ * Karakter yang diizinkan: alfanumerik, spasi, dan simbol umum (.,'-/)
+ */
+int validasi_karakter_sah(const char *str) {
+    if (str == NULL) return 0;
+
+    while (*str) {
+        char c = *str;
+
+        /* Cek karakter yang diizinkan */
+        if (!isalnum((unsigned char)c) &&
+            c != ' ' && c != '.' && c != ',' &&
+            c != '\'' && c != '-' && c != '/' &&
+            c != '(' && c != ')') {
+            return 0;  /* Karakter tidak valid */
+        }
+        str++;
+    }
+
+    return 1;
 }

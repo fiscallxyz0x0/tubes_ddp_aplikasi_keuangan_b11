@@ -1,10 +1,44 @@
+/*
+ * =============================================================================
+ * File        : pos.c
+ * Deskripsi   : Implementasi modul pengelolaan pos anggaran
+ * Author      : Elang Permadi Lau
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini mengimplementasikan fungsi-fungsi untuk mengelola pos anggaran
+ * dalam aplikasi keuangan mahasiswa, termasuk:
+ * - Operasi CRUD (Create, Read, Update, Delete) untuk pos anggaran
+ * - Perhitungan realisasi dan sisa anggaran per pos
+ * - Penentuan status pos (Aman/Tidak Aman berdasarkan budget)
+ * - Tampilan interaktif untuk manajemen pos anggaran
+ * - Validasi data pos anggaran
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - stdio.h  : Untuk fungsi input/output standar
+ * - string.h : Untuk manipulasi string
+ * - ctype.h  : Untuk fungsi tolower dalam validasi
+ * - pos.h    : Header file modul ini
+ * - file.h   : Untuk operasi penyimpanan dan pembacaan file pos
+ * - tui.h    : Untuk tampilan antarmuka pengguna
+ * - utils.h  : Untuk fungsi utilitas string dan formatting
+ *
+ * CATATAN:
+ * Fungsi validasi pos telah dipindahkan dari validator.c ke modul ini.
+ * Setiap pos anggaran memiliki batas nominal dan status yang otomatis
+ * dikalkulasi berdasarkan transaksi pengeluaran yang terkait.
+ * =============================================================================
+ */
+
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "pos.h"
 #include "file.h"
 #include "tui.h"
 #include "utils.h"
-#include "validator.h"
 
 /* ===== KONSTANTA LOKAL ===== */
 /* Aksi Menu */
@@ -907,4 +941,135 @@ void penanganan_hapus_pos(int bulan) {
     }
 
     tampilkan_konfirmasi_hapus_pos(pilihan, bulan);
+}
+
+/* ===== IMPLEMENTASI FUNGSI VALIDASI POS (dipindahkan dari validator.c) ===== */
+
+/**
+ * Helper: Membandingkan string case-insensitive
+ */
+static int str_equal_nocase(const char *s1, const char *s2) {
+    if (s1 == NULL || s2 == NULL) return 0;
+
+    while (*s1 && *s2) {
+        if (tolower((unsigned char)*s1) != tolower((unsigned char)*s2)) {
+            return 0;
+        }
+        s1++;
+        s2++;
+    }
+
+    return (*s1 == '\0' && *s2 == '\0');
+}
+
+/**
+ * Validasi nomor pos dalam range yang valid
+ */
+int validasi_no_pos(int no, int max) {
+    return (no >= 1 && no <= max);
+}
+
+/**
+ * Validasi nama pos unik (belum ada di daftar)
+ */
+int validasi_pos_unik(const char *nama, PosAnggaran *list, int count) {
+    if (nama == NULL || list == NULL) return 1;  /* Jika tidak ada data, dianggap unik */
+
+    for (int i = 0; i < count; i++) {
+        if (str_equal_nocase(nama, list[i].nama)) {
+            return 0;  /* Nama sudah ada */
+        }
+    }
+
+    return 1;  /* Nama unik */
+}
+
+/**
+ * Validasi pos dengan nomor tertentu ada dalam daftar
+ */
+int validasi_pos_ada(int no, PosAnggaran *list, int count) {
+    if (list == NULL || count <= 0) return 0;
+
+    for (int i = 0; i < count; i++) {
+        if (list[i].no == no) {
+            return 1;  /* Pos ditemukan */
+        }
+    }
+
+    return 0;  /* Pos tidak ditemukan */
+}
+
+/**
+ * Mendapatkan nama pos berdasarkan nomor
+ */
+int dapatkan_nama_pos_berdasarkan_no(int no, PosAnggaran *list, int count, char *result) {
+    if (list == NULL || result == NULL || count <= 0) return 0;
+
+    for (int i = 0; i < count; i++) {
+        if (list[i].no == no) {
+            salin_string_aman(result, list[i].nama, 21);
+            return 1;  /* Berhasil */
+        }
+    }
+
+    result[0] = '\0';
+    return 0;  /* Tidak ditemukan */
+}
+
+/**
+ * Mendapatkan index pos berdasarkan nama
+ */
+int dapatkan_index_pos_berdasarkan_nama(const char *nama, PosAnggaran *list, int count) {
+    if (nama == NULL || list == NULL) return -1;
+
+    for (int i = 0; i < count; i++) {
+        if (str_equal_nocase(nama, list[i].nama)) {
+            return i;  /* Index ditemukan */
+        }
+    }
+
+    return -1;  /* Tidak ditemukan */
+}
+
+/**
+ * Validasi nama pos untuk edit (unik kecuali nama yang sedang diedit)
+ */
+int validasi_pos_unik_edit(const char *nama, int no_edit, PosAnggaran *list, int count) {
+    if (nama == NULL || list == NULL) return 1;
+
+    for (int i = 0; i < count; i++) {
+        /* Skip pos yang sedang diedit */
+        if (list[i].no == no_edit) continue;
+
+        if (str_equal_nocase(nama, list[i].nama)) {
+            return 0;  /* Nama sudah ada di pos lain */
+        }
+    }
+
+    return 1;  /* Nama valid untuk edit */
+}
+
+/**
+ * Validasi pos bisa dihapus (tidak ada transaksi terkait)
+ */
+int validasi_pos_bisa_hapus(int no, PosAnggaran *pos_list, int pos_count) {
+    if (pos_list == NULL || pos_count <= 0) return 0;
+
+    for (int i = 0; i < pos_count; i++) {
+        if (pos_list[i].no == no) {
+            /* Pos bisa dihapus jika tidak ada transaksi */
+            return (pos_list[i].jumlah_transaksi == 0);
+        }
+    }
+
+    return 0;  /* Pos tidak ditemukan */
+}
+
+/**
+ * Validasi panjang nama pos anggaran
+ */
+int validasi_panjang_pos(const char *nama) {
+    if (nama == NULL) return 0;
+
+    return (strlen(nama) <= MAX_POS_LENGTH);
 }

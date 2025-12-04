@@ -1,3 +1,36 @@
+/*
+ * =============================================================================
+ * File        : utils.h
+ * Deskripsi   : Header file untuk modul utilitas dan fungsi-fungsi pendukung
+ * Author      : Ghaisan Khoirul Badruzaman
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini menyediakan fungsi-fungsi utilitas umum yang digunakan di seluruh
+ * aplikasi, termasuk:
+ * - Alokasi dan manajemen memori dinamis untuk struktur data
+ * - Pemrosesan dan manipulasi tanggal (parsing, formatting, validasi)
+ * - Pemrosesan dan manipulasi string (trim, case conversion, safe copy)
+ * - Formatting angka ke format Rupiah dan persentase
+ * - Fungsi validasi input (tanggal, nominal, string)
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - stdlib.h   : Untuk alokasi memori dinamis (malloc, free)
+ * - stdio.h    : Untuk fungsi input/output standar
+ * - string.h   : Untuk manipulasi string
+ * - ctype.h    : Untuk pengecekan dan konversi karakter
+ * - time.h     : Untuk mendapatkan tanggal/waktu sistem
+ * - errno.h    : Untuk penanganan error pada konversi numerik
+ *
+ * CATATAN:
+ * Modul ini merupakan modul dasar yang digunakan oleh hampir semua modul lain.
+ * Fungsi-fungsi validasi telah dipindahkan dari validator.h ke modul ini
+ * untuk konsolidasi fungsi-fungsi utilitas umum.
+ * =============================================================================
+ */
+
 #ifndef UTILS_H
 #define UTILS_H
 
@@ -340,5 +373,98 @@ int banding_string_tanpa_case(const char *s1, const char *s2);
     F. S. : Karakter newline di akhir str dihapus.
 */
 void hapus_newline_string(char *str);
+
+/* ===== FUNGSI VALIDASI (dipindahkan dari validator.h) ===== */
+
+/*
+    Function bertujuan untuk memvalidasi format tanggal dd-mm-YYYY.
+    Input : tanggal (String tanggal)
+    Output : Mengembalikan 1 jika format valid, 0 jika tidak valid.
+*/
+int validasi_format_tanggal(const char *tanggal);
+
+/*
+    Function bertujuan untuk memvalidasi kebenaran tanggal (hari, bulan, tahun).
+    Input : d (Hari), m (Bulan), y (Tahun)
+    Output : Mengembalikan 1 jika tanggal valid, 0 jika tidak valid.
+*/
+int validasi_tanggal_sah(int d, int m, int y);
+
+/*
+    Function bertujuan untuk memvalidasi tanggal bukan 00-00-0000.
+    Input : tanggal (String tanggal)
+    Output : Mengembalikan 1 jika bukan tanggal nol, 0 jika tanggal nol atau invalid.
+*/
+int validasi_bukan_nol(const char *tanggal);
+
+/*
+    Function bertujuan untuk memvalidasi tanggal secara lengkap (format dan kevalidan).
+    Input : tanggal (String tanggal format dd-mm-YYYY)
+    Output : Mengembalikan 1 jika valid, 0 jika tidak valid.
+*/
+int validasi_tanggal_lengkap(const char *tanggal);
+
+/*
+    Function bertujuan untuk memvalidasi bulan dalam range 1-12.
+    Input : bulan (Nomor bulan)
+    Output : Mengembalikan 1 jika valid, 0 jika tidak valid.
+*/
+int validasi_bulan(int bulan);
+
+/*
+    Function bertujuan untuk memvalidasi tahun (harus > 0 dan wajar).
+    Input : tahun (Tahun yang divalidasi)
+    Output : Mengembalikan 1 jika valid (1900-2100), 0 jika tidak valid.
+*/
+int validasi_tahun(int tahun);
+
+/*
+    Function bertujuan untuk memvalidasi bulan pada tanggal sesuai dengan bulan aktif.
+    Input : tanggal (String tanggal format dd-mm-YYYY), bulan_aktif (Bulan yang sedang dipilih)
+    Output : Mengembalikan 1 jika bulan sesuai, 0 jika tidak sesuai.
+*/
+int validasi_bulan_sesuai(const char *tanggal, int bulan_aktif);
+
+/*
+    Function bertujuan untuk memvalidasi nominal harus positif (> 0).
+    Input : nominal (Nilai yang akan divalidasi)
+    Output : Mengembalikan 1 jika valid (> 0), 0 jika tidak valid.
+*/
+int validasi_nominal_positif(unsigned long long nominal);
+
+/*
+    Function bertujuan untuk mem-parse string ke unsigned long long dengan validasi.
+    Input : str (String yang berisi angka)
+    Output : result (Pointer untuk menyimpan hasil parsing). Mengembalikan 1 jika berhasil, 0 jika gagal.
+*/
+int urai_nominal(const char *str, unsigned long long *result);
+
+/*
+    Function bertujuan untuk memvalidasi pilihan menu dalam range.
+    Input : pilihan (Pilihan yang divalidasi), min (Nilai minimum), max (Nilai maksimum)
+    Output : Mengembalikan 1 jika valid, 0 jika tidak valid.
+*/
+int validasi_pilihan_menu(int pilihan, int min, int max);
+
+/*
+    Function bertujuan untuk memvalidasi string tidak kosong.
+    Input : str (String yang divalidasi)
+    Output : Mengembalikan 1 jika tidak kosong, 0 jika kosong atau NULL.
+*/
+int validasi_tidak_kosong(const char *str);
+
+/*
+    Function bertujuan untuk memvalidasi string tidak mengandung karakter pipe (|).
+    Input : str (String yang divalidasi)
+    Output : Mengembalikan 1 jika tidak mengandung pipe, 0 jika mengandung.
+*/
+int validasi_tidak_ada_pipe(const char *str);
+
+/*
+    Function bertujuan untuk memvalidasi string hanya mengandung karakter yang diizinkan.
+    Input : str (String yang divalidasi)
+    Output : Mengembalikan 1 jika valid, 0 jika mengandung karakter tidak valid.
+*/
+int validasi_karakter_sah(const char *str);
 
 #endif

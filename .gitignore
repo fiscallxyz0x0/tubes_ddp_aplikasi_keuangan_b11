@@ -1,7 +1,4 @@
-*.o
-build/
-keuangan
-.cache/
-.zed/
-.DS_Store
 *.txt
+*.o
+.DS_Store
+*.log

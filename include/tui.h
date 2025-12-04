@@ -1,3 +1,38 @@
+/*
+ * =============================================================================
+ * File        : tui.h
+ * Deskripsi   : Header file untuk modul Text User Interface (TUI) berbasis ncurses
+ * Author      : Hafiz Fauzan Syafrudin
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini menyediakan fungsi-fungsi untuk antarmuka pengguna berbasis teks
+ * (TUI) menggunakan library ncurses, termasuk:
+ * - Inisialisasi dan pembersihan terminal ncurses
+ * - Manajemen warna dan atribut tampilan
+ * - Sistem menu navigasi dengan keyboard
+ * - Sistem tabel untuk menampilkan data
+ * - Komponen UI (header, footer, pesan, dialog)
+ * - Fungsi input dengan validasi terintegrasi
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - ncurses.h   : Library utama untuk TUI
+ * - string.h    : Untuk manipulasi string
+ * - ctype.h     : Untuk validasi karakter input
+ * - stdarg.h    : Untuk fungsi variadic (format string)
+ * - pos.h       : Untuk tampilan tabel pos anggaran
+ * - transaksi.h : Untuk tampilan tabel transaksi
+ * - utils.h     : Untuk fungsi utilitas string dan validasi
+ *
+ * CATATAN:
+ * Modul ini mengabstraksi penggunaan ncurses agar modul lain tidak perlu
+ * langsung bergantung pada library ncurses. Semua interaksi dengan terminal
+ * dilakukan melalui fungsi-fungsi yang disediakan modul ini.
+ * =============================================================================
+ */
+
 #ifndef TUI_H
 #define TUI_H
 

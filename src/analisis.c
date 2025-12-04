@@ -1,3 +1,38 @@
+/*
+ * =============================================================================
+ * File        : analisis.c
+ * Deskripsi   : Implementasi modul analisis dan perhitungan keuangan
+ * Author      : Ghaisan Khoirul Badruzaman
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini mengimplementasikan fungsi-fungsi untuk melakukan analisis dan
+ * perhitungan keuangan mahasiswa, termasuk:
+ * - Perhitungan total pemasukan dan pengeluaran per bulan
+ * - Perhitungan saldo dan rata-rata pengeluaran
+ * - Analisis kondisi keuangan (Defisit/Seimbang/Surplus)
+ * - Penentuan kesimpulan dan saran keuangan
+ * - Perhitungan persentase sisa terhadap pemasukan
+ * - Tampilan grafik dan laporan analisis
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - stdio.h     : Untuk fungsi input/output standar
+ * - string.h    : Untuk manipulasi string
+ * - analisis.h  : Header file modul ini
+ * - transaksi.h : Untuk akses data transaksi dan perhitungan
+ * - file.h      : Untuk operasi file analisis
+ * - tui.h       : Untuk tampilan antarmuka pengguna
+ * - pos.h       : Untuk akses data pos anggaran
+ * - utils.h     : Untuk fungsi utilitas formatting
+ *
+ * CATATAN:
+ * Kondisi keuangan ditentukan berdasarkan perbandingan pemasukan dan pengeluaran.
+ * Kesimpulan diberikan berdasarkan persentase sisa terhadap total pemasukan.
+ * =============================================================================
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include "analisis.h"

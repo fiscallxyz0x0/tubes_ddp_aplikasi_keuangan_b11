@@ -1,3 +1,35 @@
+/*
+ * =============================================================================
+ * File        : transaksi.h
+ * Deskripsi   : Header file untuk modul pengelolaan transaksi keuangan
+ * Author      : Elang Permadi Lau
+ * Version     : v1.0
+ * Tanggal     : 3 Desember 2025
+ * =============================================================================
+ *
+ * TUJUAN MODUL:
+ * Modul ini menyediakan fungsi-fungsi untuk mengelola transaksi keuangan
+ * mahasiswa, termasuk:
+ * - Operasi CRUD (Create, Read, Update, Delete) untuk transaksi
+ * - Pencatatan transaksi pemasukan dan pengeluaran
+ * - Perhitungan total pemasukan, pengeluaran, dan jumlah transaksi
+ * - Generate ID transaksi unik secara otomatis
+ * - Tampilan interaktif untuk manajemen transaksi
+ * - Validasi data transaksi
+ *
+ * MODUL YANG DIBUTUHKAN (DEPENDENCIES):
+ * - file.h  : Untuk operasi penyimpanan dan pembacaan file transaksi
+ * - pos.h   : Untuk integrasi dengan pos anggaran
+ * - utils.h : Untuk fungsi utilitas string dan formatting
+ * - tui.h   : Untuk tampilan antarmuka pengguna
+ *
+ * CATATAN:
+ * Setiap transaksi memiliki ID unik dengan format T0001-T9999.
+ * Transaksi terbagi menjadi dua jenis: Pemasukan dan Pengeluaran.
+ * Fungsi validasi transaksi telah dipindahkan dari validator.h ke modul ini.
+ * =============================================================================
+ */
+
 #ifndef TRANSAKSI_H
 #define TRANSAKSI_H
 
@@ -185,5 +217,28 @@ void penanganan_ubah_transaksi(int bulan);
     F. S. : Transaksi dihapus jika pengguna konfirmasi.
 */
 void penanganan_hapus_transaksi(int bulan);
+
+/* ===== FUNGSI VALIDASI TRANSAKSI (dipindahkan dari validator.h) ===== */
+
+/*
+    Function bertujuan untuk memvalidasi jenis transaksi (0 atau 1).
+    Input : jenis (Jenis transaksi)
+    Output : Mengembalikan 1 jika valid, 0 jika tidak valid.
+*/
+int validasi_jenis_transaksi(int jenis);
+
+/*
+    Function bertujuan untuk memvalidasi panjang deskripsi transaksi.
+    Input : deskripsi (String deskripsi)
+    Output : Mengembalikan 1 jika valid, 0 jika terlalu panjang.
+*/
+int validasi_panjang_deskripsi(const char *deskripsi);
+
+/*
+    Function bertujuan untuk memvalidasi format ID transaksi (T0001-T9999).
+    Input : id (String ID transaksi)
+    Output : Mengembalikan 1 jika valid, 0 jika tidak valid.
+*/
+int validasi_format_id(const char *id);
 
 #endif
